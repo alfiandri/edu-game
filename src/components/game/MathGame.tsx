@@ -5,12 +5,14 @@ import { motion } from "framer-motion";
 import type { QuestionRenderProps } from "./GameEngine";
 import type { CountingQuestionData, MultipleChoiceQuestionData } from "@/lib/types";
 import Button from "@/components/ui/Button";
+import { useTranslation } from "@/lib/i18n";
 
 // ── Counting Question (Preschool) ──────────────────────────
 
 export function CountingQuestion({ question, onAnswer }: QuestionRenderProps) {
   const [count, setCount] = useState(0);
   const data = question.question_data as CountingQuestionData;
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col items-center gap-6 p-6">
@@ -63,7 +65,7 @@ export function CountingQuestion({ question, onAnswer }: QuestionRenderProps) {
         size="lg"
         onClick={() => onAnswer(count)}
       >
-        Submit Answer ✓
+        {t.common.submitAnswer}
       </Button>
     </div>
   );

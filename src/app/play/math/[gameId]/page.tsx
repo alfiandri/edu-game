@@ -25,7 +25,7 @@ export default function MathGamePage({ params }: Props) {
   const initialDifficulty = getInitialDifficulty(selectedChild.age_tier);
 
   const handleComplete = (result: GameResult) => {
-    // Update local state (in production, also persist to Supabase)
+    // Update local state (in production, also persist to MySQL)
     updateChild({
       id: selectedChild.id,
       xp_total: selectedChild.xp_total + result.xpEarned,

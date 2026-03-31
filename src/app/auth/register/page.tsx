@@ -3,13 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { RegisterSchema, type RegisterInput } from "@/lib/types";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { useTranslation } from "@/lib/i18n";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [form, setForm] = useState<RegisterInput>({
     email: "",
     password: "",
@@ -35,31 +37,17 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-    const supabase = createClient();
-
-    const { data, error } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-      options: {
-        data: {
-          display_name: form.display_name,
-        },
-      },
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
     });
+    const data = await res.json();
 
-    if (error) {
-      setServerError(error.message);
+    if (!res.ok) {
+      setServerError(data.error || "Registration failed");
       setLoading(false);
       return;
-    }
-
-    // Insert into parents table
-    if (data.user) {
-      await supabase.from("parents").insert({
-        id: data.user.id,
-        email: form.email,
-        display_name: form.display_name,
-      });
     }
 
     router.push("/parent/dashboard");
@@ -70,13 +58,16 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-100 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
+          <div className="flex justify-end mb-4">
+            <LanguageSwitcher />
+          </div>
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
             <span className="text-4xl">🎓</span>
-            <span className="text-3xl font-bold text-purple-700">EduGame</span>
+            <span className="text-3xl font-bold text-purple-700">{t.common.eduGame}</span>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-800">Create Account</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{t.auth.createAccount}</h1>
           <p className="text-gray-500 mt-1">
-            Set up your parent account to get started
+            {t.auth.setupAccount}
           </p>
         </div>
 
@@ -92,8 +83,8 @@ export default function RegisterPage() {
 
           <Input
             id="display_name"
-            label="Your Name"
-            placeholder="Jane Doe"
+            label={t.auth.yourName}
+            placeholder={t.auth.namePlaceholder}
             value={form.display_name}
             onChange={(e) => setForm({ ...form, display_name: e.target.value })}
             error={errors.display_name}
@@ -101,9 +92,9 @@ export default function RegisterPage() {
 
           <Input
             id="email"
-            label="Email"
+            label={t.common.email}
             type="email"
-            placeholder="parent@example.com"
+            placeholder={t.auth.emailPlaceholder}
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             error={errors.email}
@@ -111,9 +102,9 @@ export default function RegisterPage() {
 
           <Input
             id="password"
-            label="Password"
+            label={t.common.password}
             type="password"
-            placeholder="At least 8 characters"
+            placeholder={t.auth.passwordPlaceholder}
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             error={errors.password}
@@ -126,16 +117,16 @@ export default function RegisterPage() {
             className="w-full"
             disabled={loading}
           >
-            {loading ? "Creating Account..." : "Create Account 🎉"}
+            {loading ? t.auth.creatingAccount : t.auth.createAccountButton}
           </Button>
 
           <p className="text-center text-sm text-gray-500">
-            Already have an account?{" "}
+            {t.auth.alreadyHaveAccount}{" "}
             <Link
               href="/auth/login"
               className="font-bold text-purple-600 hover:text-purple-700"
             >
-              Sign In
+              {t.common.signIn}
             </Link>
           </p>
         </form>

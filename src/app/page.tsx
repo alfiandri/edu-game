@@ -2,53 +2,27 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-const FEATURES = [
-  {
-    emoji: "🎮",
-    title: "Fun Game-Based Learning",
-    description:
-      "Math and coding come alive through interactive games designed for ages 3-12.",
-  },
-  {
-    emoji: "🧠",
-    title: "Adaptive Difficulty",
-    description:
-      "Our smart system adjusts to your child's level in real-time — never too easy, never too hard.",
-  },
-  {
-    emoji: "🏆",
-    title: "Gamification & Rewards",
-    description:
-      "XP, badges, streaks, leaderboards, and a virtual shop keep kids motivated and coming back.",
-  },
-  {
-    emoji: "📊",
-    title: "Parent Dashboard",
-    description:
-      "Track progress, view insights on strengths and areas for growth, and set learning goals.",
-  },
-  {
-    emoji: "🗺️",
-    title: "Adventure Map",
-    description:
-      "Explore a story-based learning path with game nodes, boss battles, and rewards.",
-  },
-  {
-    emoji: "🤖",
-    title: "Interactive Tutor",
-    description:
-      "Encouraging hints, explanations, and celebrations guide your child through every challenge.",
-  },
-];
-
-const AGE_TIERS = [
-  { range: "3-5", label: "Preschool", emoji: "🧒", color: "from-pink-400 to-rose-500" },
-  { range: "6-8", label: "Early Elementary", emoji: "👧", color: "from-blue-400 to-indigo-500" },
-  { range: "9-12", label: "Upper Elementary", emoji: "🧑", color: "from-green-400 to-emerald-500" },
-];
+import { useTranslation } from "@/lib/i18n";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
 export default function Home() {
+  const { t } = useTranslation();
+
+  const FEATURES = [
+    { emoji: "🎮", title: t.landing.featureFunTitle, description: t.landing.featureFunDesc },
+    { emoji: "🧠", title: t.landing.featureAdaptiveTitle, description: t.landing.featureAdaptiveDesc },
+    { emoji: "🏆", title: t.landing.featureGamificationTitle, description: t.landing.featureGamificationDesc },
+    { emoji: "📊", title: t.landing.featureDashboardTitle, description: t.landing.featureDashboardDesc },
+    { emoji: "🗺️", title: t.landing.featureMapTitle, description: t.landing.featureMapDesc },
+    { emoji: "🤖", title: t.landing.featureTutorTitle, description: t.landing.featureTutorDesc },
+  ];
+
+  const AGE_TIERS = [
+    { range: "3-5", label: t.landing.preschool, emoji: "🧒", color: "from-pink-400 to-rose-500" },
+    { range: "6-8", label: t.landing.earlyElementary, emoji: "👧", color: "from-blue-400 to-indigo-500" },
+    { range: "9-12", label: t.landing.upperElementary, emoji: "🧑", color: "from-green-400 to-emerald-500" },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -63,20 +37,21 @@ export default function Home() {
         <nav className="relative z-10 flex items-center justify-between max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center gap-2">
             <span className="text-3xl">🎓</span>
-            <span className="text-2xl font-bold">EduGame</span>
+            <span className="text-2xl font-bold">{t.common.eduGame}</span>
           </div>
           <div className="flex items-center gap-4">
+            <LanguageSwitcher className="border-white/30 hover:bg-white/10 [&_span]:text-white" />
             <Link
               href="/auth/login"
               className="px-5 py-2 rounded-xl font-bold text-white/90 hover:text-white transition-colors"
             >
-              Log In
+              {t.common.logIn}
             </Link>
             <Link
               href="/auth/register"
               className="px-6 py-2.5 rounded-xl font-bold bg-white text-purple-700 hover:bg-purple-50 transition-colors shadow-lg"
             >
-              Sign Up Free
+              {t.common.signUp}
             </Link>
           </div>
         </nav>
@@ -88,10 +63,10 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-5xl md:text-7xl font-black mb-6 leading-tight"
           >
-            Make Learning an
+            {t.landing.heroTitle1}
             <br />
             <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-              Adventure! 🚀
+              {t.landing.heroTitle2}
             </span>
           </motion.h1>
           <motion.p
@@ -100,9 +75,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl md:text-2xl text-purple-100 max-w-2xl mx-auto mb-10"
           >
-            An educational game platform where children ages 3-12 learn Math and
-            Coding through play, with adaptive difficulty and real-time insights
-            for parents.
+            {t.landing.heroDescription}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -114,13 +87,13 @@ export default function Home() {
               href="/auth/register"
               className="px-10 py-4 rounded-2xl font-bold text-lg bg-gradient-to-b from-yellow-400 to-orange-500 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
             >
-              Start Learning Free 🎮
+              {t.landing.startLearning}
             </Link>
             <Link
               href="#features"
               className="px-10 py-4 rounded-2xl font-bold text-lg bg-white/10 text-white border-2 border-white/30 hover:bg-white/20 transition-all"
             >
-              See How It Works
+              {t.landing.seeHowItWorks}
             </Link>
           </motion.div>
         </div>
@@ -129,7 +102,7 @@ export default function Home() {
       {/* Age Groups */}
       <section className="max-w-7xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-10">
-          Designed for Every Age
+          {t.landing.designedForEveryAge}
         </h2>
         <div className="grid md:grid-cols-3 gap-6">
           {AGE_TIERS.map((tier, i) => (
@@ -142,7 +115,7 @@ export default function Home() {
               className={`p-8 rounded-3xl bg-gradient-to-br ${tier.color} text-white text-center shadow-xl`}
             >
               <span className="text-5xl block mb-3">{tier.emoji}</span>
-              <h3 className="text-2xl font-bold mb-1">Ages {tier.range}</h3>
+              <h3 className="text-2xl font-bold mb-1">{t.common.ages} {tier.range}</h3>
               <p className="text-white/80 font-medium">{tier.label}</p>
             </motion.div>
           ))}
@@ -153,11 +126,10 @@ export default function Home() {
       <section id="features" className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-4">
-            Why Kids Love EduGame
+            {t.landing.whyKidsLove}
           </h2>
           <p className="text-center text-gray-500 mb-12 max-w-xl mx-auto">
-            Everything your child needs to learn, grow, and have fun — all in
-            one place.
+            {t.landing.whyKidsLoveDescription}
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {FEATURES.map((feature, i) => (
@@ -183,7 +155,7 @@ export default function Home() {
       {/* Subjects */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-          Start With Two Exciting Subjects
+          {t.landing.twoSubjects}
         </h2>
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <motion.div
@@ -192,12 +164,10 @@ export default function Home() {
           >
             <span className="text-6xl block mb-4">🧮</span>
             <h3 className="text-2xl font-bold text-blue-800 mb-2">
-              Mathematics
+              {t.landing.mathematics}
             </h3>
             <p className="text-blue-700">
-              From counting to algebra — interactive exercises that adapt to your
-              child&apos;s level. Visual aids, puzzles, and instant feedback make
-              math fun!
+              {t.landing.mathDescription}
             </p>
           </motion.div>
           <motion.div
@@ -206,11 +176,10 @@ export default function Home() {
           >
             <span className="text-6xl block mb-4">💻</span>
             <h3 className="text-2xl font-bold text-green-800 mb-2">
-              Coding & Logic
+              {t.landing.codingLogic}
             </h3>
             <p className="text-green-700">
-              Pattern recognition, sequencing, and block-based programming
-              build computational thinking from an early age.
+              {t.landing.codingDescription}
             </p>
           </motion.div>
         </div>
@@ -220,17 +189,16 @@ export default function Home() {
       <section className="bg-gradient-to-br from-purple-600 to-indigo-700 text-white py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-4">
-            Ready to Make Learning Fun? 🎉
+            {t.landing.readyTitle}
           </h2>
           <p className="text-xl text-purple-100 mb-8">
-            Join thousands of families who are transforming education into an
-            adventure.
+            {t.landing.readyDescription}
           </p>
           <Link
             href="/auth/register"
             className="inline-block px-12 py-5 rounded-2xl font-bold text-xl bg-gradient-to-b from-yellow-400 to-orange-500 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
           >
-            Get Started — It&apos;s Free! 🚀
+            {t.landing.getStarted}
           </Link>
         </div>
       </section>
@@ -240,10 +208,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-2xl">🎓</span>
-            <span className="text-lg font-bold text-white">EduGame</span>
+            <span className="text-lg font-bold text-white">{t.common.eduGame}</span>
           </div>
           <p className="text-sm">
-            © {new Date().getFullYear()} EduGame. Making learning an adventure.
+            © {new Date().getFullYear()} {t.common.eduGame}. {t.landing.footerTagline}
           </p>
         </div>
       </footer>

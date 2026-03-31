@@ -9,6 +9,7 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import StreakDisplay from "@/components/gamification/StreakDisplay";
 import XPBar from "@/components/gamification/XPBar";
 import { getLevelFromXP } from "@/components/gamification/XPBar";
+import { useTranslation, interpolate } from "@/lib/i18n";
 
 interface Props {
   child: Child;
@@ -21,6 +22,7 @@ export default function ChildAnalyticsClient({
   sessions,
   childBadges,
 }: Props) {
+  const { t } = useTranslation();
   const stats = useMemo(() => {
     const totalGames = sessions.length;
     const avgAccuracy =
@@ -42,19 +44,19 @@ export default function ChildAnalyticsClient({
     // Insights
     const insights: string[] = [];
     if (avgAccuracy >= 90) {
-      insights.push("🌟 Excellent accuracy! Your child is mastering the content.");
+      insights.push(t.insights.excellentAccuracy);
     } else if (avgAccuracy >= 70) {
-      insights.push("👍 Good progress! Accuracy is solid and improving.");
+      insights.push(t.insights.goodProgress);
     } else if (avgAccuracy >= 50) {
-      insights.push("📈 Progressing well. More practice will boost accuracy further.");
+      insights.push(t.insights.progressing);
     } else if (totalGames > 0) {
-      insights.push("💪 Keep encouraging practice — every game builds skills!");
+      insights.push(t.insights.keepEncouraging);
     }
 
     if (child.current_streak >= 7) {
-      insights.push(`🔥 Amazing ${child.current_streak}-day streak! Consistency is key.`);
+      insights.push(interpolate(t.insights.amazingStreak, { streak: child.current_streak }));
     } else if (child.current_streak >= 3) {
-      insights.push(`🔥 ${child.current_streak}-day streak going strong!`);
+      insights.push(interpolate(t.insights.streakStrong, { streak: child.current_streak }));
     }
 
     const avgDifficulty =
@@ -63,11 +65,11 @@ export default function ChildAnalyticsClient({
           recentSessions.length
         : 0;
     if (avgDifficulty > 6) {
-      insights.push("🚀 Working at advanced difficulty levels. Very impressive!");
+      insights.push(t.insights.advancedDifficulty);
     }
 
     return { totalGames, avgAccuracy, totalXPEarned, difficultyTrend, insights };
-  }, [sessions, child]);
+  }, [sessions, child, t]);
 
   const level = getLevelFromXP(child.xp_total);
 
@@ -77,7 +79,7 @@ export default function ChildAnalyticsClient({
         href="/parent/dashboard"
         className="text-sm text-purple-600 font-semibold hover:text-purple-700 mb-4 inline-block"
       >
-        ← Back to Dashboard
+        {t.parent.backToDashboard}
       </Link>
 
       {/* Header */}
@@ -90,7 +92,7 @@ export default function ChildAnalyticsClient({
             {child.display_name}
           </h1>
           <p className="text-gray-500 capitalize">
-            {child.age_tier.replace("_", " ")} · Born{" "}
+            {child.age_tier.replace("_", " ")} · {t.common.born}{" "}
             {new Date(child.date_of_birth).toLocaleDateString()}
           </p>
         </div>
@@ -111,32 +113,32 @@ export default function ChildAnalyticsClient({
           <p className="text-3xl font-bold text-purple-600">
             {formatXP(child.xp_total)}
           </p>
-          <p className="text-sm text-gray-500">Total XP</p>
+          <p className="text-sm text-gray-500">{t.parent.totalXP}</p>
         </Card>
         <Card variant="stat">
           <p className="text-3xl font-bold text-blue-600">
             {stats.totalGames}
           </p>
-          <p className="text-sm text-gray-500">Games Played</p>
+          <p className="text-sm text-gray-500">{t.parent.gamesPlayed}</p>
         </Card>
         <Card variant="stat">
           <p className="text-3xl font-bold text-green-600">
             {stats.avgAccuracy}%
           </p>
-          <p className="text-sm text-gray-500">Avg Accuracy</p>
+          <p className="text-sm text-gray-500">{t.parent.avgAccuracy}</p>
         </Card>
         <Card variant="stat">
           <p className="text-3xl font-bold text-yellow-600">
             {child.currency_balance}
           </p>
-          <p className="text-sm text-gray-500">🪙 Coins</p>
+          <p className="text-sm text-gray-500">🪙 {t.common.coins}</p>
         </Card>
       </div>
 
       {/* Streak & Insights */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         <Card>
-          <h3 className="text-lg font-bold text-gray-700 mb-3">Streak</h3>
+          <h3 className="text-lg font-bold text-gray-700 mb-3">{t.parent.streakLabel}</h3>
           <StreakDisplay
             currentStreak={child.current_streak}
             longestStreak={child.longest_streak}
@@ -144,7 +146,7 @@ export default function ChildAnalyticsClient({
         </Card>
         <Card>
           <h3 className="text-lg font-bold text-gray-700 mb-3">
-            Learning Insights
+            {t.parent.learningInsights}
           </h3>
           {stats.insights.length > 0 ? (
             <ul className="space-y-2">
@@ -159,7 +161,7 @@ export default function ChildAnalyticsClient({
             </ul>
           ) : (
             <p className="text-sm text-gray-400">
-              Play some games to see insights here!
+              {t.parent.playToSeeInsights}
             </p>
           )}
         </Card>
@@ -168,11 +170,11 @@ export default function ChildAnalyticsClient({
       {/* Recent Sessions */}
       <Card className="mb-8">
         <h3 className="text-lg font-bold text-gray-700 mb-4">
-          Recent Game Sessions
+          {t.parent.recentSessions}
         </h3>
         {sessions.length === 0 ? (
           <p className="text-gray-400 text-center py-6">
-            No games played yet. Start playing to see progress! 🎮
+            {t.parent.noGamesYet}
           </p>
         ) : (
           <div className="space-y-3">
@@ -183,7 +185,7 @@ export default function ChildAnalyticsClient({
               >
                 <div>
                   <p className="text-sm font-bold text-gray-700">
-                    Game Session
+                    {t.parent.gameSession}
                   </p>
                   <p className="text-xs text-gray-400">
                     {new Date(session.started_at).toLocaleString()}
@@ -194,13 +196,13 @@ export default function ChildAnalyticsClient({
                     <p className="text-sm font-bold text-green-600">
                       {session.accuracy_pct}%
                     </p>
-                    <p className="text-xs text-gray-400">Accuracy</p>
+                    <p className="text-xs text-gray-400">{t.common.accuracy}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-sm font-bold text-purple-600">
                       +{session.xp_earned}
                     </p>
-                    <p className="text-xs text-gray-400">XP</p>
+                    <p className="text-xs text-gray-400">{t.common.xp}</p>
                   </div>
                 </div>
               </div>
@@ -212,11 +214,11 @@ export default function ChildAnalyticsClient({
       {/* Badges */}
       <Card>
         <h3 className="text-lg font-bold text-gray-700 mb-4">
-          Badges Earned ({childBadges.length})
+          {t.parent.badgesEarned} ({childBadges.length})
         </h3>
         {childBadges.length === 0 ? (
           <p className="text-gray-400 text-center py-6">
-            Complete games to earn badges! 🏅
+            {t.parent.noBadgesYet}
           </p>
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">

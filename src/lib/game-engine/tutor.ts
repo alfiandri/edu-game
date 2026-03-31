@@ -1,61 +1,34 @@
 import type { TutorMessage } from "@/lib/types";
-
-const ENCOURAGEMENT_CORRECT = [
-  "Amazing job! You got it right! 🎉",
-  "You're a superstar! ⭐",
-  "Fantastic! Keep going! 🚀",
-  "Way to go! That was perfect! 💪",
-  "Brilliant! You're so smart! 🧠",
-  "Awesome! You're on fire! 🔥",
-  "Incredible work! 🌟",
-  "Yes! Nailed it! 🎯",
-  "You're doing so great! 💖",
-  "That's the right answer! Well done! 👏",
-];
-
-const ENCOURAGEMENT_WRONG = [
-  "Good try! Let's look at this together. 🤔",
-  "Almost there! Don't give up! 💪",
-  "That takes courage to try! Let's learn from this. 📚",
-  "Oops! But mistakes help us learn! 🌱",
-  "Not quite, but you're getting closer! 🎯",
-  "Keep going — every mistake makes you smarter! 🧠",
-  "That's okay! Let's try to understand why. 💡",
-];
-
-const STREAK_MESSAGES: Record<number, string> = {
-  3: "Three in a row! You're on a roll! 🎳",
-  5: "FIVE correct! Unstoppable! 🏆",
-  7: "Seven streak! You're a genius! 🌟",
-  10: "TEN IN A ROW! LEGENDARY! 👑",
-};
-
-const CELEBRATION_MESSAGES = [
-  "🎉🎊 Level Complete! 🎊🎉",
-  "🏆 Amazing performance! 🏆",
-  "⭐ You earned a star! ⭐",
-];
+import type { Translations } from "@/lib/i18n";
+import { interpolate } from "@/lib/i18n";
 
 export function getTutorMessage(
   isCorrect: boolean,
   consecutiveCorrect: number,
+  t: Translations,
   explanation?: string
 ): TutorMessage {
+  const streakMessages: Record<number, string> = {
+    3: t.tutor.streak3,
+    5: t.tutor.streak5,
+    7: t.tutor.streak7,
+    10: t.tutor.streak10,
+  };
+
   if (isCorrect) {
-    // Check for streak milestone
-    if (STREAK_MESSAGES[consecutiveCorrect]) {
+    if (streakMessages[consecutiveCorrect]) {
       return {
         type: "celebration",
-        text: STREAK_MESSAGES[consecutiveCorrect],
+        text: streakMessages[consecutiveCorrect],
       };
     }
     return {
       type: "encouragement",
-      text: ENCOURAGEMENT_CORRECT[Math.floor(Math.random() * ENCOURAGEMENT_CORRECT.length)],
+      text: t.tutor.correct[Math.floor(Math.random() * t.tutor.correct.length)],
     };
   }
 
-  const base = ENCOURAGEMENT_WRONG[Math.floor(Math.random() * ENCOURAGEMENT_WRONG.length)];
+  const base = t.tutor.wrong[Math.floor(Math.random() * t.tutor.wrong.length)];
   if (explanation) {
     return {
       type: "explanation",
@@ -68,13 +41,13 @@ export function getTutorMessage(
   };
 }
 
-export function getHintMessage(hintIndex: number, totalHints: number): TutorMessage {
+export function getHintMessage(hintIndex: number, totalHints: number, t: Translations): TutorMessage {
   const prefix =
     hintIndex === 0
-      ? "Here's a little help: "
+      ? t.tutor.hintPrefix1
       : hintIndex === 1
-        ? "Another clue: "
-        : "Big hint: ";
+        ? t.tutor.hintPrefix2
+        : t.tutor.hintPrefix3;
 
   return {
     type: "hint",
@@ -82,16 +55,16 @@ export function getHintMessage(hintIndex: number, totalHints: number): TutorMess
   };
 }
 
-export function getCompletionMessage(accuracy: number, xpEarned: number): TutorMessage {
+export function getCompletionMessage(accuracy: number, xpEarned: number, t: Translations): TutorMessage {
   let text: string;
   if (accuracy >= 90) {
-    text = `🌟 Outstanding! ${accuracy}% accuracy — you earned ${xpEarned} XP! You're a champion!`;
+    text = interpolate(t.tutor.completionOutstanding, { accuracy, xp: xpEarned });
   } else if (accuracy >= 70) {
-    text = `💪 Great job! ${accuracy}% accuracy — you earned ${xpEarned} XP! Keep practicing!`;
+    text = interpolate(t.tutor.completionGreat, { accuracy, xp: xpEarned });
   } else if (accuracy >= 50) {
-    text = `👍 Good effort! ${accuracy}% accuracy — you earned ${xpEarned} XP! Practice makes perfect!`;
+    text = interpolate(t.tutor.completionGood, { accuracy, xp: xpEarned });
   } else {
-    text = `🌱 Nice try! ${accuracy}% accuracy — you earned ${xpEarned} XP! Let's try again and improve!`;
+    text = interpolate(t.tutor.completionTry, { accuracy, xp: xpEarned });
   }
 
   return { type: "celebration", text };

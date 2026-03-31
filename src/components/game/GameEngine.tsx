@@ -11,6 +11,7 @@ import { generateQuestion } from "@/lib/game-engine/question-generator";
 import type { Question, GameType, AnswerRecord, TutorMessage } from "@/lib/types";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Button from "@/components/ui/Button";
+import { useTranslation } from "@/lib/i18n";
 
 interface GameEngineProps {
   gameId: string;
@@ -71,11 +72,12 @@ export default function GameEngine({
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const { t } = useTranslation();
 
   // Generate questions on mount
   useEffect(() => {
     const questions: Question[] = Array.from({ length: questionCount }, (_, i) => {
-      const q = generateQuestion(gameType, initialDifficulty);
+      const q = generateQuestion(gameType, initialDifficulty, t);
       return {
         id: `q-${i}`,
         game_id: gameId,
@@ -147,6 +149,7 @@ export default function GameEngine({
       const msg = getTutorMessage(
         isCorrect,
         isCorrect ? gameState.consecutiveCorrect + 1 : 0,
+        t,
         isCorrect ? undefined : question.explanation
       );
       setTutorMessage(msg);
@@ -234,7 +237,7 @@ export default function GameEngine({
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="text-5xl mb-4 animate-bounce">🎮</div>
-          <p className="text-lg font-bold text-gray-600">Loading game...</p>
+          <p className="text-lg font-bold text-gray-600">{t.common.loadingGame}</p>
         </div>
       </div>
     );
@@ -249,7 +252,7 @@ export default function GameEngine({
       gameState.answers.length > 0
         ? Math.round((totalCorrect / gameState.answers.length) * 100)
         : 0;
-    const completionMsg = getCompletionMessage(accuracy, gameState.xpEarned);
+    const completionMsg = getCompletionMessage(accuracy, gameState.xpEarned, t);
 
     return (
       <motion.div
@@ -265,7 +268,7 @@ export default function GameEngine({
           {accuracy >= 80 ? "🏆" : accuracy >= 50 ? "⭐" : "💪"}
         </motion.div>
         <h2 className="text-3xl font-bold text-gray-800 mb-2">
-          Game Complete!
+          {t.play.gameComplete}
         </h2>
         <p className="text-lg text-gray-600 mb-6 text-center max-w-md">
           {completionMsg.text}
@@ -276,23 +279,23 @@ export default function GameEngine({
             <p className="text-3xl font-bold text-purple-600">
               {totalCorrect}/{gameState.answers.length}
             </p>
-            <p className="text-sm text-gray-500">Correct</p>
+            <p className="text-sm text-gray-500">{t.common.correct}</p>
           </div>
           <div className="text-center">
             <p className="text-3xl font-bold text-blue-600">{accuracy}%</p>
-            <p className="text-sm text-gray-500">Accuracy</p>
+            <p className="text-sm text-gray-500">{t.common.accuracy}</p>
           </div>
           <div className="text-center">
             <p className="text-3xl font-bold text-yellow-600">
               +{gameState.xpEarned}
             </p>
-            <p className="text-sm text-gray-500">XP Earned</p>
+            <p className="text-sm text-gray-500">{t.common.xpEarned}</p>
           </div>
         </div>
 
         <div className="flex gap-4">
           <Button variant="ghost" onClick={onExit}>
-            Back to Map
+            {t.common.backToMap}
           </Button>
           <Button
             variant="primary"
@@ -302,7 +305,7 @@ export default function GameEngine({
               const questions: Question[] = Array.from(
                 { length: questionCount },
                 (_, i) => {
-                  const q = generateQuestion(gameType, gameState.difficultyLevel);
+                  const q = generateQuestion(gameType, gameState.difficultyLevel, t);
                   return {
                     id: `q-${i}`,
                     game_id: gameId,
@@ -319,7 +322,7 @@ export default function GameEngine({
               setQuestionStartTime(Date.now());
             }}
           >
-            Play Again 🎮
+            {t.common.playAgain}
           </Button>
         </div>
       </motion.div>
@@ -356,7 +359,7 @@ export default function GameEngine({
 
       {/* Difficulty indicator */}
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-xs font-semibold text-gray-400">Difficulty</span>
+        <span className="text-xs font-semibold text-gray-400">{t.common.difficulty}</span>
         <div className="flex gap-0.5">
           {Array.from({ length: 10 }, (_, i) => (
             <div
@@ -405,11 +408,11 @@ export default function GameEngine({
             size="sm"
             onClick={handleRequestHint}
           >
-            💡 Need a hint? ({currentQuestion.hints.length - hintsUsed} left)
+            {t.common.needHint} ({currentQuestion.hints.length - hintsUsed} {t.common.hintsLeft})
           </Button>
           {hintsUsed > 0 && (
             <p className="text-xs text-yellow-600 mt-1">
-              ⚠️ Each hint reduces XP by 33%
+              {t.common.hintXPWarning}
             </p>
           )}
         </motion.div>

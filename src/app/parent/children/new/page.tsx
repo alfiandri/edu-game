@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { CreateChildSchema, type CreateChildInput } from "@/lib/types";
 import { getAgeTier } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { useTranslation } from "@/lib/i18n";
 
 export default function NewChildPage() {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function NewChildPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof CreateChildInput, string>>>({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,32 +35,15 @@ export default function NewChildPage() {
     }
 
     setLoading(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setServerError("Not authenticated");
-      setLoading(false);
-      return;
-    }
-
-    const ageTier = getAgeTier(new Date(form.date_of_birth));
-
-    const { error } = await supabase.from("children").insert({
-      parent_id: user.id,
-      display_name: form.display_name,
-      date_of_birth: form.date_of_birth,
-      age_tier: ageTier,
-      xp_total: 0,
-      currency_balance: 0,
-      current_streak: 0,
-      longest_streak: 0,
+    const res = await fetch("/api/children", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
     });
+    const data = await res.json();
 
-    if (error) {
-      setServerError(error.message);
+    if (!res.ok) {
+      setServerError(data.error || t.parent.notAuthenticated);
       setLoading(false);
       return;
     }
@@ -78,9 +62,9 @@ export default function NewChildPage() {
     <div className="max-w-lg mx-auto">
       <div className="text-center mb-8">
         <span className="text-5xl block mb-3">👶</span>
-        <h1 className="text-2xl font-bold text-gray-800">Add Child Profile</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t.parent.addChildProfile}</h1>
         <p className="text-gray-500 mt-1">
-          Create a profile for your child to start learning
+          {t.parent.createChildDesc}
         </p>
       </div>
 
@@ -96,8 +80,8 @@ export default function NewChildPage() {
 
         <Input
           id="display_name"
-          label="Child's Name"
-          placeholder="e.g., Emma"
+          label={t.parent.childName}
+          placeholder={t.parent.childNamePlaceholder}
           value={form.display_name}
           onChange={(e) => setForm({ ...form, display_name: e.target.value })}
           error={errors.display_name}
@@ -105,7 +89,7 @@ export default function NewChildPage() {
 
         <Input
           id="date_of_birth"
-          label="Date of Birth"
+          label={t.parent.dateOfBirth}
           type="date"
           value={form.date_of_birth}
           onChange={(e) =>
@@ -117,9 +101,8 @@ export default function NewChildPage() {
         {previewTier && (
           <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl">
             <p className="text-sm text-purple-700">
-              <span className="font-bold">Age Tier:</span>{" "}
-              <span className="capitalize">{previewTier}</span> — content will
-              be tailored to this level
+              <span className="font-bold">{t.parent.ageTier}:</span>{" "}
+              <span className="capitalize">{previewTier}</span> — {t.parent.contentTailored}
             </p>
           </div>
         )}
@@ -131,7 +114,7 @@ export default function NewChildPage() {
           className="w-full"
           disabled={loading}
         >
-          {loading ? "Creating..." : "Create Profile 🎉"}
+          {loading ? t.parent.creating : t.parent.createProfile}
         </Button>
       </form>
     </div>

@@ -2,6 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import type { Badge } from "@/lib/types";
+import { useTranslation } from "@/lib/i18n";
+import { getTranslatedBadgeName, getTranslatedBadgeDescription } from "@/lib/gamification/badges";
 
 interface BadgePopupProps {
   badge: Badge | null;
@@ -10,6 +12,7 @@ interface BadgePopupProps {
 }
 
 export function BadgePopup({ badge, show, onClose }: BadgePopupProps) {
+  const { t } = useTranslation();
   if (!badge) return null;
 
   return (
@@ -38,13 +41,13 @@ export function BadgePopup({ badge, show, onClose }: BadgePopupProps) {
               🏅
             </motion.div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              Badge Unlocked!
+              {t.gamification.badgeUnlocked}
             </h2>
             <h3 className="text-xl font-bold text-purple-600 mb-2">
-              {badge.name}
+              {getTranslatedBadgeName(badge.slug, t)}
             </h3>
             <p className="text-gray-600 text-center max-w-xs mb-6">
-              {badge.description}
+              {getTranslatedBadgeDescription(badge.slug, t)}
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -52,7 +55,7 @@ export function BadgePopup({ badge, show, onClose }: BadgePopupProps) {
               onClick={onClose}
               className="px-8 py-3 rounded-2xl bg-gradient-to-b from-purple-500 to-purple-700 text-white font-bold shadow-lg"
             >
-              Awesome! 🎉
+              {t.gamification.awesome}
             </motion.button>
           </motion.div>
         </div>
@@ -66,6 +69,7 @@ interface BadgeDisplayProps {
 }
 
 export function BadgeGrid({ badges }: BadgeDisplayProps) {
+  const { t } = useTranslation();
   const BADGE_EMOJIS: Record<string, string> = {
     first_game: "🎮",
     math_beginner: "🔢",
@@ -103,7 +107,7 @@ export function BadgeGrid({ badges }: BadgeDisplayProps) {
             {BADGE_EMOJIS[badge.slug] || "🏅"}
           </span>
           <span className="text-xs font-bold text-center text-gray-700 leading-tight">
-            {badge.name}
+            {getTranslatedBadgeName(badge.slug, t)}
           </span>
           {badge.earned && badge.earned_at && (
             <span className="text-[10px] text-gray-500 mt-0.5">

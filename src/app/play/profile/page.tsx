@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useChildStore } from "@/stores/child-store";
 import type { AvatarItem, AvatarCategory, AvatarConfig } from "@/lib/types";
 import AvatarBuilder from "@/components/gamification/AvatarBuilder";
+import { useTranslation } from "@/lib/i18n";
 
-// Default inventory items (MVP — in production, loaded from Supabase)
+// Default inventory items (MVP — in production, loaded from MySQL)
 const DEFAULT_ITEMS: AvatarItem[] = [
   { id: "h1", category: "head", name: "Crown", image_url: "👑", price_currency: 0, is_default: true },
   { id: "h2", category: "head", name: "Cap", image_url: "🧢", price_currency: 0, is_default: true },
@@ -21,6 +22,7 @@ const DEFAULT_ITEMS: AvatarItem[] = [
 
 export default function ProfilePage() {
   const { selectedChild } = useChildStore();
+  const { t } = useTranslation();
   const [config, setConfig] = useState<AvatarConfig>(
     selectedChild?.avatar_config || {
       equipped_head: null,
@@ -51,7 +53,7 @@ export default function ProfilePage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        ✨ Customize Your Avatar
+        {t.play.customizeAvatar}
       </h1>
       <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg">
         <AvatarBuilder

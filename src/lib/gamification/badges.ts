@@ -1,4 +1,5 @@
 import type { Badge, BadgeCriteria, ChildBadge, GameSession } from "@/lib/types";
+import type { Translations } from "@/lib/i18n";
 
 export interface BadgeCheckContext {
   totalGamesCompleted: number;
@@ -183,3 +184,34 @@ export const DEFAULT_BADGES: Omit<Badge, "id">[] = [
     criteria: { type: "games_completed", count: 100 } as BadgeCriteria,
   },
 ];
+
+const BADGE_SLUG_KEYS: Record<string, { name: keyof Translations["badges"]; desc: keyof Translations["badges"] }> = {
+  first_game: { name: "firstSteps", desc: "firstStepsDesc" },
+  math_beginner: { name: "mathExplorer", desc: "mathExplorerDesc" },
+  math_whiz: { name: "mathWhiz", desc: "mathWhizDesc" },
+  coding_beginner: { name: "codeExplorer", desc: "codeExplorerDesc" },
+  coding_whiz: { name: "codeMaster", desc: "codeMasterDesc" },
+  perfect_score_1: { name: "perfect", desc: "perfectDesc" },
+  perfect_score_5: { name: "perfectionist", desc: "perfectionistDesc" },
+  streak_3: { name: "gettingWarmedUp", desc: "gettingWarmedUpDesc" },
+  streak_7: { name: "weekWarrior", desc: "weekWarriorDesc" },
+  streak_30: { name: "monthlyChampion", desc: "monthlyChampionDesc" },
+  xp_100: { name: "risingStar", desc: "risingStarDesc" },
+  xp_500: { name: "shiningStar", desc: "shiningStarDesc" },
+  xp_1000: { name: "superstar", desc: "superstarDesc" },
+  xp_5000: { name: "legend", desc: "legendDesc" },
+  accuracy_90: { name: "sharpMind", desc: "sharpMindDesc" },
+  ten_games: { name: "dedicatedLearner", desc: "dedicatedLearnerDesc" },
+  fifty_games: { name: "knowledgeSeeker", desc: "knowledgeSeekerDesc" },
+  hundred_games: { name: "grandScholar", desc: "grandScholarDesc" },
+};
+
+export function getTranslatedBadgeName(slug: string, t: Translations): string {
+  const key = BADGE_SLUG_KEYS[slug];
+  return key ? t.badges[key.name] : slug;
+}
+
+export function getTranslatedBadgeDescription(slug: string, t: Translations): string {
+  const key = BADGE_SLUG_KEYS[slug];
+  return key ? t.badges[key.desc] : "";
+}

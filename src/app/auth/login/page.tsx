@@ -3,13 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { LoginSchema, type LoginInput } from "@/lib/types";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { useTranslation } from "@/lib/i18n";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [form, setForm] = useState<LoginInput>({ email: "", password: "" });
   const [errors, setErrors] = useState<Partial<Record<keyof LoginInput, string>>>({});
   const [serverError, setServerError] = useState("");
@@ -31,14 +33,15 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: form.email,
-      password: form.password,
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
     });
+    const data = await res.json();
 
-    if (error) {
-      setServerError(error.message);
+    if (!res.ok) {
+      setServerError(data.error || "Login failed");
       setLoading(false);
       return;
     }
@@ -51,12 +54,15 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-100 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
+          <div className="flex justify-end mb-4">
+            <LanguageSwitcher />
+          </div>
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
             <span className="text-4xl">🎓</span>
-            <span className="text-3xl font-bold text-purple-700">EduGame</span>
+            <span className="text-3xl font-bold text-purple-700">{t.common.eduGame}</span>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-800">Welcome Back!</h1>
-          <p className="text-gray-500 mt-1">Sign in to your parent account</p>
+          <h1 className="text-2xl font-bold text-gray-800">{t.auth.welcomeBack}</h1>
+          <p className="text-gray-500 mt-1">{t.auth.signInToAccount}</p>
         </div>
 
         <form
@@ -71,9 +77,9 @@ export default function LoginPage() {
 
           <Input
             id="email"
-            label="Email"
+            label={t.common.email}
             type="email"
-            placeholder="parent@example.com"
+            placeholder={t.auth.emailPlaceholder}
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             error={errors.email}
@@ -81,7 +87,7 @@ export default function LoginPage() {
 
           <Input
             id="password"
-            label="Password"
+            label={t.common.password}
             type="password"
             placeholder="••••••••"
             value={form.password}
@@ -96,16 +102,16 @@ export default function LoginPage() {
             className="w-full"
             disabled={loading}
           >
-            {loading ? "Signing in..." : "Sign In 🚀"}
+            {loading ? t.auth.signingIn : t.auth.signInButton}
           </Button>
 
           <p className="text-center text-sm text-gray-500">
-            Don&apos;t have an account?{" "}
+            {t.auth.noAccount}{" "}
             <Link
               href="/auth/register"
               className="font-bold text-purple-600 hover:text-purple-700"
             >
-              Sign Up Free
+              {t.common.signUp}
             </Link>
           </p>
         </form>

@@ -10,6 +10,7 @@ import type {
 } from "@/lib/types";
 import { MultipleChoiceQuestion } from "./MathGame";
 import Button from "@/components/ui/Button";
+import { useTranslation } from "@/lib/i18n";
 
 // ── Sequencing Question ──────────────────────────────────
 
@@ -17,6 +18,7 @@ export function SequencingQuestion({ question, onAnswer }: QuestionRenderProps) 
   const data = question.question_data as SequencingQuestionData;
   const [orderedItems, setOrderedItems] = useState<string[]>([]);
   const [remainingItems, setRemainingItems] = useState<string[]>([...data.items]);
+  const { t } = useTranslation();
 
   const addItem = (item: string) => {
     setOrderedItems([...orderedItems, item]);
@@ -42,12 +44,12 @@ export function SequencingQuestion({ question, onAnswer }: QuestionRenderProps) 
       {/* Ordered sequence */}
       <div className="w-full max-w-md">
         <p className="text-sm font-semibold text-gray-500 mb-2">
-          Your order:
+          {t.play.yourOrder}
         </p>
         <div className="min-h-[60px] p-3 rounded-2xl bg-purple-50 border-2 border-purple-200 flex flex-wrap gap-2">
           {orderedItems.length === 0 ? (
             <p className="text-gray-400 text-sm">
-              Tap items below to add them in order
+              {t.play.tapToAdd}
             </p>
           ) : (
             orderedItems.map((item, i) => (
@@ -72,7 +74,7 @@ export function SequencingQuestion({ question, onAnswer }: QuestionRenderProps) 
       {/* Available items */}
       <div className="w-full max-w-md">
         <p className="text-sm font-semibold text-gray-500 mb-2">
-          Available steps:
+          {t.play.availableSteps}
         </p>
         <div className="flex flex-wrap gap-2">
           {remainingItems.map((item, i) => (
@@ -95,7 +97,7 @@ export function SequencingQuestion({ question, onAnswer }: QuestionRenderProps) 
         onClick={handleSubmit}
         disabled={orderedItems.length !== data.items.length}
       >
-        Check Order ✓
+        {t.common.checkOrder}
       </Button>
     </div>
   );
@@ -113,6 +115,7 @@ export function BlockProgrammingQuestion({
   const [robotDir, setRobotDir] = useState<"right" | "down" | "left" | "up">("right");
   const [isRunning, setIsRunning] = useState(false);
   const [trail, setTrail] = useState<{ row: number; col: number }[]>([]);
+  const { t } = useTranslation();
 
   const addBlock = (block: ProgramBlock) => {
     setProgram([...program, { ...block, id: `${block.id}-${Date.now()}` }]);
@@ -260,12 +263,12 @@ export function BlockProgrammingQuestion({
       {/* Program Sequence */}
       <div className="w-full max-w-md">
         <p className="text-sm font-semibold text-gray-500 mb-2">
-          Your program:
+          {t.play.yourProgram}
         </p>
         <div className="min-h-[48px] p-2 rounded-xl bg-gray-50 border-2 border-gray-200 flex flex-wrap gap-1">
           {program.length === 0 ? (
             <p className="text-gray-400 text-xs p-1">
-              Add blocks to create your program
+              {t.play.addBlocks}
             </p>
           ) : (
             program.map((block, i) => (
@@ -287,7 +290,7 @@ export function BlockProgrammingQuestion({
       {/* Controls */}
       <div className="flex gap-3">
         <Button variant="ghost" size="sm" onClick={resetRobot} disabled={isRunning}>
-          🔄 Reset
+          {t.common.reset}
         </Button>
         <Button
           variant="success"
@@ -295,7 +298,7 @@ export function BlockProgrammingQuestion({
           onClick={runProgram}
           disabled={isRunning || program.length === 0}
         >
-          {isRunning ? "Running... 🤖" : "▶ Run Program"}
+          {isRunning ? t.common.running : t.common.runProgram}
         </Button>
       </div>
     </div>

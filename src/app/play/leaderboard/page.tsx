@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useChildStore } from "@/stores/child-store";
 import type { LeaderboardEntry, LeaderboardPeriod } from "@/lib/types";
 import LeaderboardComponent from "@/components/gamification/Leaderboard";
+import { useTranslation } from "@/lib/i18n";
 
-// Demo leaderboard data (MVP — in production from Supabase)
+// Demo leaderboard data (MVP — in production from MySQL)
 function generateDemoEntries(
   childId: string,
   childName: string,
@@ -49,6 +50,7 @@ function generateDemoEntries(
 export default function LeaderboardPage() {
   const { selectedChild } = useChildStore();
   const [period, setPeriod] = useState<LeaderboardPeriod>("weekly");
+  const { t } = useTranslation();
 
   if (!selectedChild) return null;
 
@@ -61,7 +63,7 @@ export default function LeaderboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">🏆 Leaderboard</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">{t.play.leaderboard}</h1>
       <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg">
         <LeaderboardComponent
           entries={entries}

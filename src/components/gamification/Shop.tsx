@@ -6,6 +6,7 @@ import type { AvatarItem, AvatarCategory } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
+import { useTranslation } from "@/lib/i18n";
 
 interface ShopProps {
   items: AvatarItem[];
@@ -23,13 +24,14 @@ export default function Shop({
   const [activeCategory, setActiveCategory] = useState<AvatarCategory | "all">("all");
   const [confirmItem, setConfirmItem] = useState<AvatarItem | null>(null);
   const [purchasing, setPurchasing] = useState(false);
+  const { t } = useTranslation();
 
   const categories: { key: AvatarCategory | "all"; label: string }[] = [
-    { key: "all", label: "🛍️ All" },
-    { key: "head", label: "🎩 Head" },
-    { key: "body", label: "👕 Body" },
-    { key: "accessory", label: "🎒 Accessory" },
-    { key: "background", label: "🌈 Background" },
+    { key: "all", label: t.play.allCategories },
+    { key: "head", label: t.play.headCategory },
+    { key: "body", label: t.play.bodyCategory },
+    { key: "accessory", label: t.play.accessoryCategory },
+    { key: "background", label: t.play.backgroundCategory },
   ];
 
   const filteredItems =
@@ -51,7 +53,7 @@ export default function Shop({
     <div>
       {/* Balance */}
       <div className="flex items-center justify-between mb-6 p-4 rounded-2xl bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300">
-        <span className="text-lg font-bold text-gray-700">Your Coins</span>
+        <span className="text-lg font-bold text-gray-700">{t.play.yourCoins}</span>
         <span className="text-2xl font-bold text-yellow-600">
           🪙 {formatCurrency(currencyBalance)}
         </span>
@@ -95,7 +97,7 @@ export default function Shop({
             >
               {owned && (
                 <span className="absolute top-2 right-2 text-green-500 text-sm font-bold">
-                  ✓ Owned
+                  {t.common.owned}
                 </span>
               )}
               <span className="text-5xl">{item.image_url || "🎭"}</span>
@@ -116,7 +118,7 @@ export default function Shop({
       <Modal
         open={!!confirmItem}
         onClose={() => setConfirmItem(null)}
-        title="Buy Item?"
+        title={t.play.buyItem}
       >
         {confirmItem && (
           <div className="flex flex-col items-center gap-4">
@@ -126,7 +128,7 @@ export default function Shop({
               🪙 {confirmItem.price_currency} coins
             </p>
             <p className="text-sm text-gray-500">
-              Balance after purchase:{" "}
+              {t.play.balanceAfter}{" "}
               <span className="font-bold">
                 🪙 {formatCurrency(currencyBalance - confirmItem.price_currency)}
               </span>
@@ -137,14 +139,14 @@ export default function Shop({
                 onClick={() => setConfirmItem(null)}
                 disabled={purchasing}
               >
-                Cancel
+                {t.common.cancel}
               </Button>
               <Button
                 variant="success"
                 onClick={handlePurchase}
                 disabled={purchasing}
               >
-                {purchasing ? "Buying..." : "Buy! 🪙"}
+                {purchasing ? t.play.buying : t.play.buyButton}
               </Button>
             </div>
           </div>

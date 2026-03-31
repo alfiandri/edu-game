@@ -2,34 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { useChildStore } from "@/stores/child-store";
 import type { Child } from "@/lib/types";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/lib/i18n";
 
 export default function SelectChildPage() {
   const router = useRouter();
   const [children, setChildren] = useState<Child[]>([]);
   const [loading, setLoading] = useState(true);
   const { setSelectedChild, setChildren: setStoreChildren } = useChildStore();
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
+      try {
+        const res = await fetch("/api/children");
+        if (!res.ok) {
+          router.push("/auth/login");
+          return;
+        }
+        const data = await res.json();
+        setChildren(data.children || []);
+        setStoreChildren(data.children || []);
+      } catch {
         router.push("/auth/login");
-        return;
       }
-      const { data } = await supabase
-        .from("children")
-        .select("*")
-        .eq("parent_id", user.id)
-        .order("created_at");
-      setChildren((data || []) as Child[]);
-      setStoreChildren((data || []) as Child[]);
       setLoading(false);
     }
     load();
@@ -47,7 +45,7 @@ export default function SelectChildPage() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100">
         <div className="text-center">
           <div className="text-5xl mb-4 animate-bounce">🎮</div>
-          <p className="text-lg font-bold text-gray-600">Loading...</p>
+          <p className="text-lg font-bold text-gray-600">{t.common.loading}</p>
         </div>
       </div>
     );
@@ -58,18 +56,18 @@ export default function SelectChildPage() {
       <div className="w-full max-w-xl">
         <div className="text-center mb-10">
           <span className="text-6xl block mb-4">🎮</span>
-          <h1 className="text-3xl font-bold text-gray-800">Who&apos;s Playing?</h1>
-          <p className="text-gray-500 mt-2">Choose a player to start!</p>
+          <h1 className="text-3xl font-bold text-gray-800">{t.play.whosPlaying}</h1>
+          <p className="text-gray-500 mt-2">{t.play.choosePlayer}</p>
         </div>
 
         {children.length === 0 ? (
           <div className="text-center">
-            <p className="text-gray-500 mb-4">No children added yet.</p>
+            <p className="text-gray-500 mb-4">{t.play.noChildrenYet}</p>
             <button
               onClick={() => router.push("/parent/children/new")}
               className="px-8 py-3 rounded-2xl font-bold bg-purple-600 text-white"
             >
-              Add a Child First
+              {t.play.addChildFirst}
             </button>
           </div>
         ) : (

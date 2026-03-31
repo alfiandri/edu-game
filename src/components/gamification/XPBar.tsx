@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { formatXP } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 interface XPBarProps {
   currentXP: number;
@@ -30,6 +31,7 @@ function getLevelFromXP(xp: number): { level: number; currentLevelXP: number; ne
 }
 
 export default function XPBar({ currentXP, levelXP, level }: XPBarProps) {
+  const { t } = useTranslation();
   const { currentLevelXP, nextLevelXP } = getLevelFromXP(currentXP);
   const percentage = (currentLevelXP / nextLevelXP) * 100;
 
@@ -40,9 +42,9 @@ export default function XPBar({ currentXP, levelXP, level }: XPBarProps) {
       </div>
       <div className="flex-1">
         <div className="flex justify-between text-xs font-semibold text-gray-600 mb-1">
-          <span>Level {level}</span>
+          <span>{t.gamification.levelLabel} {level}</span>
           <span>
-            {formatXP(currentLevelXP)} / {formatXP(nextLevelXP)} XP
+            {formatXP(currentLevelXP)} / {formatXP(nextLevelXP)} {t.common.xp}
           </span>
         </div>
         <div className="h-3 rounded-full bg-gray-200 overflow-hidden">
@@ -56,7 +58,7 @@ export default function XPBar({ currentXP, levelXP, level }: XPBarProps) {
       </div>
       <div className="text-right">
         <span className="text-sm font-bold text-purple-600">
-          {formatXP(currentXP)} XP
+          {formatXP(currentXP)} {t.common.xp}
         </span>
       </div>
     </div>

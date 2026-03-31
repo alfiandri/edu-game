@@ -3,5 +3,5 @@ import { deleteSessionCookie } from "@/lib/auth/session";
 
 export async function POST() {
   await deleteSessionCookie();
-  return NextResponse.redirect(new URL("/", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"));
+  return NextResponse.json({ success: true });
 }

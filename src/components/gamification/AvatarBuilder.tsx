@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import type { AvatarItem, AvatarConfig, AvatarCategory } from "@/lib/types";
+import { useTranslation } from "@/lib/i18n";
 
 interface AvatarBuilderProps {
   inventory: AvatarItem[];
@@ -30,7 +31,15 @@ export default function AvatarBuilder({
   onEquip,
 }: AvatarBuilderProps) {
   const [activeCategory, setActiveCategory] = useState<AvatarCategory>("head");
+  const { t } = useTranslation();
   const categories: AvatarCategory[] = ["head", "body", "accessory", "background"];
+
+  const CATEGORY_LABELS_T: Record<AvatarCategory, string> = {
+    head: t.play.headCategory,
+    body: t.play.bodyCategory,
+    accessory: t.play.accessoryCategory,
+    background: t.play.backgroundCategory,
+  };
 
   const categoryItems = inventory.filter((i) => i.category === activeCategory);
 
@@ -63,7 +72,7 @@ export default function AvatarBuilder({
             )}
           </div>
         </div>
-        <p className="text-sm text-gray-500 mt-3">Your Avatar</p>
+        <p className="text-sm text-gray-500 mt-3">{t.play.yourAvatar}</p>
       </div>
 
       {/* Category Tabs & Items */}
@@ -79,7 +88,7 @@ export default function AvatarBuilder({
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
-              {CATEGORY_LABELS[cat]}
+              {CATEGORY_LABELS_T[cat]}
             </button>
           ))}
         </div>
@@ -97,7 +106,7 @@ export default function AvatarBuilder({
             }`}
           >
             <span className="text-2xl">❌</span>
-            <span className="text-xs font-medium text-gray-500">None</span>
+            <span className="text-xs font-medium text-gray-500">{t.common.none}</span>
           </motion.button>
 
           {categoryItems.map((item) => {

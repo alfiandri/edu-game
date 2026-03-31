@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslation } from "@/lib/i18n";
 
 interface StreakDisplayProps {
   currentStreak: number;
@@ -8,6 +9,7 @@ interface StreakDisplayProps {
 }
 
 export default function StreakDisplay({ currentStreak, longestStreak }: StreakDisplayProps) {
+  const { t } = useTranslation();
   const flameSize = Math.min(currentStreak, 10);
 
   return (
@@ -37,11 +39,11 @@ export default function StreakDisplay({ currentStreak, longestStreak }: StreakDi
             {currentStreak}
           </span>
           <span className="text-sm font-semibold text-gray-500">
-            day{currentStreak !== 1 ? "s" : ""} streak
+            {currentStreak !== 1 ? t.common.daysStreak : t.common.dayStreak}
           </span>
         </div>
         <p className="text-xs text-gray-400">
-          Best: {longestStreak} day{longestStreak !== 1 ? "s" : ""}
+          {t.common.best}: {longestStreak} {longestStreak !== 1 ? t.common.days : t.common.day}
         </p>
       </div>
     </div>

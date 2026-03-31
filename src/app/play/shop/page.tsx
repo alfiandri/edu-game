@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useChildStore } from "@/stores/child-store";
 import type { AvatarItem } from "@/lib/types";
 import Shop from "@/components/gamification/Shop";
+import { useTranslation } from "@/lib/i18n";
 
-// Shop items (MVP — in production loaded from Supabase)
+// Shop items (MVP — in production loaded from MySQL)
 const SHOP_ITEMS: AvatarItem[] = [
   { id: "sh1", category: "head", name: "Pirate Hat", image_url: "🏴‍☠️", price_currency: 50, is_default: false },
   { id: "sh2", category: "head", name: "Tiara", image_url: "👸", price_currency: 60, is_default: false },
@@ -24,6 +25,7 @@ const SHOP_ITEMS: AvatarItem[] = [
 export default function ShopPage() {
   const { selectedChild, updateChild } = useChildStore();
   const [ownedIds, setOwnedIds] = useState<Set<string>>(new Set());
+  const { t } = useTranslation();
 
   if (!selectedChild) return null;
 
@@ -42,7 +44,7 @@ export default function ShopPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">🛍️ Shop</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">{t.play.shopTitle}</h1>
       <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg">
         <Shop
           items={SHOP_ITEMS}

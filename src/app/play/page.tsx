@@ -7,55 +7,57 @@ import type { AdventureNode, AgeTier, GameType } from "@/lib/types";
 import AdventureMap from "@/components/gamification/AdventureMap";
 import XPBar from "@/components/gamification/XPBar";
 import { getLevelFromXP } from "@/components/gamification/XPBar";
+import { useTranslation } from "@/lib/i18n";
+import type { Translations } from "@/lib/i18n";
 
 // Static adventure nodes for MVP (would come from DB in production)
-function getAdventureNodes(subject: "math" | "coding-logic", ageTier: AgeTier): AdventureNode[] {
+function getAdventureNodes(subject: "math" | "coding-logic", ageTier: AgeTier, t: Translations): AdventureNode[] {
   const mathNodes: Record<AgeTier, AdventureNode[]> = {
     preschool: [
-      { id: "m-p-1", subject_id: "math", age_tier: "preschool", order_index: 1, title: "Count the Stars", game_id: "g-count-1", node_type: "game", xp_requirement: 0 },
-      { id: "m-p-2", subject_id: "math", age_tier: "preschool", order_index: 2, title: "Shape World", game_id: "g-shape-1", node_type: "game", xp_requirement: 20 },
-      { id: "m-p-3", subject_id: "math", age_tier: "preschool", order_index: 3, title: "Number Boss", game_id: "g-count-2", node_type: "boss", xp_requirement: 50 },
-      { id: "m-p-4", subject_id: "math", age_tier: "preschool", order_index: 4, title: "Treasure!", game_id: null, node_type: "reward", xp_requirement: 80 },
-      { id: "m-p-5", subject_id: "math", age_tier: "preschool", order_index: 5, title: "More Counting", game_id: "g-count-3", node_type: "game", xp_requirement: 100 },
+      { id: "m-p-1", subject_id: "math", age_tier: "preschool", order_index: 1, title: t.nodes.countTheStars, game_id: "g-count-1", node_type: "game", xp_requirement: 0 },
+      { id: "m-p-2", subject_id: "math", age_tier: "preschool", order_index: 2, title: t.nodes.shapeWorld, game_id: "g-shape-1", node_type: "game", xp_requirement: 20 },
+      { id: "m-p-3", subject_id: "math", age_tier: "preschool", order_index: 3, title: t.nodes.numberBoss, game_id: "g-count-2", node_type: "boss", xp_requirement: 50 },
+      { id: "m-p-4", subject_id: "math", age_tier: "preschool", order_index: 4, title: t.nodes.treasure, game_id: null, node_type: "reward", xp_requirement: 80 },
+      { id: "m-p-5", subject_id: "math", age_tier: "preschool", order_index: 5, title: t.nodes.moreCounting, game_id: "g-count-3", node_type: "game", xp_requirement: 100 },
     ],
     early_elementary: [
-      { id: "m-e-1", subject_id: "math", age_tier: "early_elementary", order_index: 1, title: "Add It Up", game_id: "g-addsub-1", node_type: "game", xp_requirement: 0 },
-      { id: "m-e-2", subject_id: "math", age_tier: "early_elementary", order_index: 2, title: "Subtraction Station", game_id: "g-addsub-2", node_type: "game", xp_requirement: 30 },
-      { id: "m-e-3", subject_id: "math", age_tier: "early_elementary", order_index: 3, title: "Times Tables", game_id: "g-mult-1", node_type: "game", xp_requirement: 70 },
-      { id: "m-e-4", subject_id: "math", age_tier: "early_elementary", order_index: 4, title: "Math Dragon", game_id: "g-mult-2", node_type: "boss", xp_requirement: 120 },
-      { id: "m-e-5", subject_id: "math", age_tier: "early_elementary", order_index: 5, title: "Reward Chest", game_id: null, node_type: "reward", xp_requirement: 160 },
-      { id: "m-e-6", subject_id: "math", age_tier: "early_elementary", order_index: 6, title: "Word Problems", game_id: "g-word-1", node_type: "game", xp_requirement: 200 },
+      { id: "m-e-1", subject_id: "math", age_tier: "early_elementary", order_index: 1, title: t.nodes.addItUp, game_id: "g-addsub-1", node_type: "game", xp_requirement: 0 },
+      { id: "m-e-2", subject_id: "math", age_tier: "early_elementary", order_index: 2, title: t.nodes.subtractionStation, game_id: "g-addsub-2", node_type: "game", xp_requirement: 30 },
+      { id: "m-e-3", subject_id: "math", age_tier: "early_elementary", order_index: 3, title: t.nodes.timesTables, game_id: "g-mult-1", node_type: "game", xp_requirement: 70 },
+      { id: "m-e-4", subject_id: "math", age_tier: "early_elementary", order_index: 4, title: t.nodes.mathDragon, game_id: "g-mult-2", node_type: "boss", xp_requirement: 120 },
+      { id: "m-e-5", subject_id: "math", age_tier: "early_elementary", order_index: 5, title: t.nodes.rewardChest, game_id: null, node_type: "reward", xp_requirement: 160 },
+      { id: "m-e-6", subject_id: "math", age_tier: "early_elementary", order_index: 6, title: t.nodes.wordProblems, game_id: "g-word-1", node_type: "game", xp_requirement: 200 },
     ],
     upper_elementary: [
-      { id: "m-u-1", subject_id: "math", age_tier: "upper_elementary", order_index: 1, title: "Multiply Master", game_id: "g-mult-3", node_type: "game", xp_requirement: 0 },
-      { id: "m-u-2", subject_id: "math", age_tier: "upper_elementary", order_index: 2, title: "Fraction Fun", game_id: "g-frac-1", node_type: "game", xp_requirement: 50 },
-      { id: "m-u-3", subject_id: "math", age_tier: "upper_elementary", order_index: 3, title: "Fraction Boss", game_id: "g-frac-2", node_type: "boss", xp_requirement: 120 },
-      { id: "m-u-4", subject_id: "math", age_tier: "upper_elementary", order_index: 4, title: "Algebra Intro", game_id: "g-alg-1", node_type: "game", xp_requirement: 180 },
-      { id: "m-u-5", subject_id: "math", age_tier: "upper_elementary", order_index: 5, title: "Prize Vault", game_id: null, node_type: "reward", xp_requirement: 250 },
+      { id: "m-u-1", subject_id: "math", age_tier: "upper_elementary", order_index: 1, title: t.nodes.multiplyMaster, game_id: "g-mult-3", node_type: "game", xp_requirement: 0 },
+      { id: "m-u-2", subject_id: "math", age_tier: "upper_elementary", order_index: 2, title: t.nodes.fractionFun, game_id: "g-frac-1", node_type: "game", xp_requirement: 50 },
+      { id: "m-u-3", subject_id: "math", age_tier: "upper_elementary", order_index: 3, title: t.nodes.fractionBoss, game_id: "g-frac-2", node_type: "boss", xp_requirement: 120 },
+      { id: "m-u-4", subject_id: "math", age_tier: "upper_elementary", order_index: 4, title: t.nodes.algebraIntro, game_id: "g-alg-1", node_type: "game", xp_requirement: 180 },
+      { id: "m-u-5", subject_id: "math", age_tier: "upper_elementary", order_index: 5, title: t.nodes.prizeVault, game_id: null, node_type: "reward", xp_requirement: 250 },
     ],
   };
 
   const codingNodes: Record<AgeTier, AdventureNode[]> = {
     preschool: [
-      { id: "c-p-1", subject_id: "coding-logic", age_tier: "preschool", order_index: 1, title: "Pattern Time", game_id: "g-pattern-1", node_type: "game", xp_requirement: 0 },
-      { id: "c-p-2", subject_id: "coding-logic", age_tier: "preschool", order_index: 2, title: "Sort It Out", game_id: "g-sort-1", node_type: "game", xp_requirement: 20 },
-      { id: "c-p-3", subject_id: "coding-logic", age_tier: "preschool", order_index: 3, title: "Sequence Steps", game_id: "g-seq-1", node_type: "game", xp_requirement: 50 },
-      { id: "c-p-4", subject_id: "coding-logic", age_tier: "preschool", order_index: 4, title: "Logic Boss", game_id: "g-pattern-2", node_type: "boss", xp_requirement: 80 },
-      { id: "c-p-5", subject_id: "coding-logic", age_tier: "preschool", order_index: 5, title: "Treasure!", game_id: null, node_type: "reward", xp_requirement: 100 },
+      { id: "c-p-1", subject_id: "coding-logic", age_tier: "preschool", order_index: 1, title: t.nodes.patternTime, game_id: "g-pattern-1", node_type: "game", xp_requirement: 0 },
+      { id: "c-p-2", subject_id: "coding-logic", age_tier: "preschool", order_index: 2, title: t.nodes.sortItOut, game_id: "g-sort-1", node_type: "game", xp_requirement: 20 },
+      { id: "c-p-3", subject_id: "coding-logic", age_tier: "preschool", order_index: 3, title: t.nodes.sequenceSteps, game_id: "g-seq-1", node_type: "game", xp_requirement: 50 },
+      { id: "c-p-4", subject_id: "coding-logic", age_tier: "preschool", order_index: 4, title: t.nodes.logicBoss, game_id: "g-pattern-2", node_type: "boss", xp_requirement: 80 },
+      { id: "c-p-5", subject_id: "coding-logic", age_tier: "preschool", order_index: 5, title: t.nodes.treasure, game_id: null, node_type: "reward", xp_requirement: 100 },
     ],
     early_elementary: [
-      { id: "c-e-1", subject_id: "coding-logic", age_tier: "early_elementary", order_index: 1, title: "Robot Walk", game_id: "g-block-1", node_type: "game", xp_requirement: 0 },
-      { id: "c-e-2", subject_id: "coding-logic", age_tier: "early_elementary", order_index: 2, title: "Maze Runner", game_id: "g-block-2", node_type: "game", xp_requirement: 40 },
-      { id: "c-e-3", subject_id: "coding-logic", age_tier: "early_elementary", order_index: 3, title: "If-Then", game_id: "g-cond-1", node_type: "game", xp_requirement: 90 },
-      { id: "c-e-4", subject_id: "coding-logic", age_tier: "early_elementary", order_index: 4, title: "Code Boss", game_id: "g-block-3", node_type: "boss", xp_requirement: 140 },
-      { id: "c-e-5", subject_id: "coding-logic", age_tier: "early_elementary", order_index: 5, title: "Prize Box", game_id: null, node_type: "reward", xp_requirement: 180 },
+      { id: "c-e-1", subject_id: "coding-logic", age_tier: "early_elementary", order_index: 1, title: t.nodes.robotWalk, game_id: "g-block-1", node_type: "game", xp_requirement: 0 },
+      { id: "c-e-2", subject_id: "coding-logic", age_tier: "early_elementary", order_index: 2, title: t.nodes.mazeRunner, game_id: "g-block-2", node_type: "game", xp_requirement: 40 },
+      { id: "c-e-3", subject_id: "coding-logic", age_tier: "early_elementary", order_index: 3, title: t.nodes.ifThen, game_id: "g-cond-1", node_type: "game", xp_requirement: 90 },
+      { id: "c-e-4", subject_id: "coding-logic", age_tier: "early_elementary", order_index: 4, title: t.nodes.codeBoss, game_id: "g-block-3", node_type: "boss", xp_requirement: 140 },
+      { id: "c-e-5", subject_id: "coding-logic", age_tier: "early_elementary", order_index: 5, title: t.nodes.prizeBox, game_id: null, node_type: "reward", xp_requirement: 180 },
     ],
     upper_elementary: [
-      { id: "c-u-1", subject_id: "coding-logic", age_tier: "upper_elementary", order_index: 1, title: "Loop Master", game_id: "g-block-4", node_type: "game", xp_requirement: 0 },
-      { id: "c-u-2", subject_id: "coding-logic", age_tier: "upper_elementary", order_index: 2, title: "Algorithm Arena", game_id: "g-algo-1", node_type: "game", xp_requirement: 60 },
-      { id: "c-u-3", subject_id: "coding-logic", age_tier: "upper_elementary", order_index: 3, title: "Debug Quest", game_id: "g-debug-1", node_type: "game", xp_requirement: 130 },
-      { id: "c-u-4", subject_id: "coding-logic", age_tier: "upper_elementary", order_index: 4, title: "Final Boss", game_id: "g-block-5", node_type: "boss", xp_requirement: 200 },
-      { id: "c-u-5", subject_id: "coding-logic", age_tier: "upper_elementary", order_index: 5, title: "Grand Prize", game_id: null, node_type: "reward", xp_requirement: 280 },
+      { id: "c-u-1", subject_id: "coding-logic", age_tier: "upper_elementary", order_index: 1, title: t.nodes.loopMaster, game_id: "g-block-4", node_type: "game", xp_requirement: 0 },
+      { id: "c-u-2", subject_id: "coding-logic", age_tier: "upper_elementary", order_index: 2, title: t.nodes.algorithmArena, game_id: "g-algo-1", node_type: "game", xp_requirement: 60 },
+      { id: "c-u-3", subject_id: "coding-logic", age_tier: "upper_elementary", order_index: 3, title: t.nodes.debugQuest, game_id: "g-debug-1", node_type: "game", xp_requirement: 130 },
+      { id: "c-u-4", subject_id: "coding-logic", age_tier: "upper_elementary", order_index: 4, title: t.nodes.finalBoss, game_id: "g-block-5", node_type: "boss", xp_requirement: 200 },
+      { id: "c-u-5", subject_id: "coding-logic", age_tier: "upper_elementary", order_index: 5, title: t.nodes.grandPrize, game_id: null, node_type: "reward", xp_requirement: 280 },
     ],
   };
 
@@ -84,12 +86,13 @@ const GAME_TYPE_MAP: Record<string, GameType> = {
 export default function PlayHomePage() {
   const router = useRouter();
   const { selectedChild } = useChildStore();
+  const { t } = useTranslation();
 
   if (!selectedChild) return null;
 
   const ageTier = selectedChild.age_tier;
-  const mathNodes = getAdventureNodes("math", ageTier);
-  const codingNodes = getAdventureNodes("coding-logic", ageTier);
+  const mathNodes = getAdventureNodes("math", ageTier, t);
+  const codingNodes = getAdventureNodes("coding-logic", ageTier, t);
   const level = getLevelFromXP(selectedChild.xp_total);
 
   const handleNodeClick = (node: AdventureNode) => {
@@ -120,7 +123,7 @@ export default function PlayHomePage() {
         >
           <div className="flex items-center gap-3 mb-4">
             <span className="text-3xl">🧮</span>
-            <h2 className="text-2xl font-bold text-blue-800">Math Adventure</h2>
+            <h2 className="text-2xl font-bold text-blue-800">{t.play.mathAdventure}</h2>
           </div>
           <AdventureMap
             nodes={mathNodes}
@@ -140,7 +143,7 @@ export default function PlayHomePage() {
           <div className="flex items-center gap-3 mb-4">
             <span className="text-3xl">💻</span>
             <h2 className="text-2xl font-bold text-green-800">
-              Coding & Logic Adventure
+              {t.play.codingAdventure}
             </h2>
           </div>
           <AdventureMap

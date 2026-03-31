@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import type { LeaderboardEntry } from "@/lib/types";
 import { formatXP } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
@@ -17,10 +18,11 @@ export default function Leaderboard({
   period,
   onPeriodChange,
 }: LeaderboardProps) {
+  const { t } = useTranslation();
   const periods = [
-    { key: "daily" as const, label: "Today" },
-    { key: "weekly" as const, label: "This Week" },
-    { key: "alltime" as const, label: "All Time" },
+    { key: "daily" as const, label: t.common.today },
+    { key: "weekly" as const, label: t.common.thisWeek },
+    { key: "alltime" as const, label: t.common.allTime },
   ];
 
   const getMedalEmoji = (rank: number) => {
@@ -73,8 +75,8 @@ export default function Leaderboard({
               </div>
               <div className="flex-1">
                 <span className={`font-bold ${isCurrentChild ? "text-purple-700" : "text-gray-800"}`}>
-                  {entry.child?.display_name || "Player"}
-                  {isCurrentChild && " (You)"}
+                  {entry.child?.display_name || t.common.player}
+                  {isCurrentChild && ` ${t.common.you}`}
                 </span>
               </div>
               <span className="font-bold text-purple-600">

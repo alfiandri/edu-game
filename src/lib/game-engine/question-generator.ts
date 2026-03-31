@@ -1,4 +1,6 @@
 import type { Question, QuestionData, GameType, AgeTier } from "@/lib/types";
+import type { Translations } from "@/lib/i18n";
+import { interpolate } from "@/lib/i18n";
 
 // ── Math Question Generator ────────────────────────────────
 
@@ -19,7 +21,7 @@ const EMOJIS = ["🍎", "⭐", "🐟", "🎈", "🌸", "🐱", "🦋", "🍕", "
 
 // ── Counting (Preschool) ───────────────────────────────────
 
-function generateCountingQuestion(difficulty: number): {
+function generateCountingQuestion(difficulty: number, t: Translations): {
   data: QuestionData;
   answer: number;
   hints: string[];
@@ -33,24 +35,24 @@ function generateCountingQuestion(difficulty: number): {
   return {
     data: {
       type: "counting",
-      prompt: `How many ${emoji} do you see?`,
+      prompt: interpolate(t.questions.howMany, { emoji }),
       objectCount: count,
       objectEmoji: emoji,
     },
     answer: count,
     hints: [
-      "Try pointing at each one as you count!",
-      `Start from the first ${emoji} and count slowly.`,
-      `The answer is between ${Math.max(1, count - 2)} and ${count + 2}.`,
+      t.questions.hintCount1,
+      interpolate(t.questions.hintCount2, { emoji }),
+      interpolate(t.questions.hintCount3, { min: Math.max(1, count - 2), max: count + 2 }),
     ],
-    explanation: `There are ${count} ${emoji}!`,
+    explanation: interpolate(t.questions.explanationCount, { count, emoji }),
     xp: 5 + difficulty,
   };
 }
 
 // ── Addition/Subtraction ───────────────────────────────────
 
-function generateAddSubQuestion(difficulty: number): {
+function generateAddSubQuestion(difficulty: number, t: Translations): {
   data: QuestionData;
   answer: number;
   hints: string[];
@@ -60,10 +62,10 @@ function generateAddSubQuestion(difficulty: number): {
   const isAddition = Math.random() > 0.4;
   const maxNum = Math.min(5 + difficulty * 3, 50);
   const a = randomInt(1, maxNum);
-  const b = randomInt(1, isAddition ? maxNum : a); // For subtraction, b <= a
+  const b = randomInt(1, isAddition ? maxNum : a);
   const answer = isAddition ? a + b : a - b;
   const op = isAddition ? "+" : "-";
-  const prompt = `What is ${a} ${op} ${b}?`;
+  const prompt = interpolate(t.questions.whatIs, { expression: `${a} ${op} ${b}` });
 
   const options = generateNumberOptions(answer, 4, 0, maxNum * 2);
 
@@ -76,12 +78,12 @@ function generateAddSubQuestion(difficulty: number): {
     answer,
     hints: [
       isAddition
-        ? `Try counting up from ${a}, add ${b} more.`
-        : `Start at ${a} and count back ${b}.`,
+        ? interpolate(t.questions.hintAddUp, { a, b })
+        : interpolate(t.questions.hintSubDown, { a, b }),
       isAddition
-        ? `${a} + ${b} is a bit more than ${a}.`
-        : `${a} - ${b} is less than ${a}.`,
-      `The answer is close to ${answer}.`,
+        ? interpolate(t.questions.hintAddMore, { a, b, a2: a })
+        : interpolate(t.questions.hintSubLess, { a, b, a2: a }),
+      interpolate(t.questions.hintClose, { answer }),
     ],
     explanation: `${a} ${op} ${b} = ${answer}`,
     xp: 8 + difficulty * 2,
@@ -90,7 +92,7 @@ function generateAddSubQuestion(difficulty: number): {
 
 // ── Multiplication ─────────────────────────────────────────
 
-function generateMultiplicationQuestion(difficulty: number): {
+function generateMultiplicationQuestion(difficulty: number, t: Translations): {
   data: QuestionData;
   answer: number;
   hints: string[];
@@ -101,7 +103,7 @@ function generateMultiplicationQuestion(difficulty: number): {
   const a = randomInt(2, maxFactor);
   const b = randomInt(2, maxFactor);
   const answer = a * b;
-  const prompt = `What is ${a} × ${b}?`;
+  const prompt = interpolate(t.questions.whatIs, { expression: `${a} × ${b}` });
 
   const options = generateNumberOptions(answer, 4, 1, maxFactor * maxFactor + 10);
 
@@ -113,18 +115,18 @@ function generateMultiplicationQuestion(difficulty: number): {
     },
     answer,
     hints: [
-      `Think of ${a} groups of ${b}.`,
-      `${a} × ${b} is the same as adding ${b} together ${a} times.`,
-      `The answer is between ${answer - 5} and ${answer + 5}.`,
+      interpolate(t.questions.hintMultGroups, { a, b }),
+      interpolate(t.questions.hintMultAdd, { a, b, a2: a }),
+      interpolate(t.questions.hintMultBetween, { min: answer - 5, max: answer + 5 }),
     ],
-    explanation: `${a} × ${b} = ${answer}. That's ${a} groups of ${b}!`,
+    explanation: interpolate(t.questions.explanationMult, { a, b, answer, a2: a, b2: b }),
     xp: 10 + difficulty * 2,
   };
 }
 
 // ── Fractions ──────────────────────────────────────────────
 
-function generateFractionQuestion(difficulty: number): {
+function generateFractionQuestion(difficulty: number, t: Translations): {
   data: QuestionData;
   answer: string;
   hints: string[];
@@ -136,7 +138,8 @@ function generateFractionQuestion(difficulty: number): {
   const numerator2 = randomInt(1, denominator - numerator1);
   const resultNumerator = numerator1 + numerator2;
 
-  const prompt = `What is ${numerator1}/${denominator} + ${numerator2}/${denominator}?`;
+  const expr = `${numerator1}/${denominator} + ${numerator2}/${denominator}`;
+  const prompt = interpolate(t.questions.whatIs, { expression: expr });
   const answer = `${resultNumerator}/${denominator}`;
 
   const options = [
@@ -154,18 +157,18 @@ function generateFractionQuestion(difficulty: number): {
     },
     answer,
     hints: [
-      "When fractions have the same bottom number, just add the top numbers!",
-      `Add ${numerator1} + ${numerator2} for the top number.`,
-      `The bottom number stays as ${denominator}.`,
+      t.questions.hintFracSame,
+      interpolate(t.questions.hintFracAdd, { a: numerator1, b: numerator2 }),
+      interpolate(t.questions.hintFracBottom, { d: denominator }),
     ],
-    explanation: `${numerator1}/${denominator} + ${numerator2}/${denominator} = ${answer}. When denominators are the same, add the numerators!`,
+    explanation: interpolate(t.questions.explanationFrac, { expr, answer }),
     xp: 12 + difficulty * 2,
   };
 }
 
 // ── Pattern Recognition (Coding/Logic) ────────────────────
 
-function generatePatternQuestion(difficulty: number): {
+function generatePatternQuestion(difficulty: number, t: Translations): {
   data: QuestionData;
   answer: string;
   hints: string[];
@@ -173,19 +176,19 @@ function generatePatternQuestion(difficulty: number): {
   xp: number;
 } {
   const patterns = [
-    { seq: ["🔴", "🔵", "🔴", "🔵", "🔴"], answer: "🔵", rule: "alternating red and blue" },
-    { seq: ["⭐", "⭐", "🌙", "⭐", "⭐"], answer: "🌙", rule: "star, star, moon repeating" },
-    { seq: ["1", "2", "3", "4", "5"], answer: "6", rule: "counting up by 1" },
-    { seq: ["2", "4", "6", "8", "10"], answer: "12", rule: "counting up by 2" },
-    { seq: ["🔺", "🔵", "🔺", "🔵", "🔺"], answer: "🔵", rule: "alternating triangle and circle" },
-    { seq: ["A", "B", "C", "D", "E"], answer: "F", rule: "alphabetical order" },
-    { seq: ["1", "3", "5", "7", "9"], answer: "11", rule: "odd numbers" },
-    { seq: ["🌞", "🌧", "🌞", "🌧", "🌞"], answer: "🌧", rule: "alternating sun and rain" },
+    { seq: ["🔴", "🔵", "🔴", "🔵", "🔴"], answer: "🔵", rule: t.questions.alternatingRedBlue },
+    { seq: ["⭐", "⭐", "🌙", "⭐", "⭐"], answer: "🌙", rule: t.questions.starStarMoon },
+    { seq: ["1", "2", "3", "4", "5"], answer: "6", rule: t.questions.countingBy1 },
+    { seq: ["2", "4", "6", "8", "10"], answer: "12", rule: t.questions.countingBy2 },
+    { seq: ["🔺", "🔵", "🔺", "🔵", "🔺"], answer: "🔵", rule: t.questions.alternatingTriangleCircle },
+    { seq: ["A", "B", "C", "D", "E"], answer: "F", rule: t.questions.alphabeticalOrder },
+    { seq: ["1", "3", "5", "7", "9"], answer: "11", rule: t.questions.oddNumbers },
+    { seq: ["🌞", "🌧", "🌞", "🌧", "🌞"], answer: "🌧", rule: t.questions.alternatingSunRain },
   ];
 
   const maxIndex = Math.min(difficulty + 2, patterns.length);
   const pattern = patterns[randomInt(0, maxIndex - 1)];
-  const prompt = `What comes next? ${pattern.seq.join("  ")}  ?`;
+  const prompt = interpolate(t.questions.whatComesNext, { sequence: pattern.seq.join("  ") });
 
   const wrongOptions = ["🟢", "🔶", "7", "X"].filter((o) => o !== pattern.answer);
   const options = shuffle([pattern.answer, ...wrongOptions.slice(0, 3)]);
@@ -198,18 +201,18 @@ function generatePatternQuestion(difficulty: number): {
     },
     answer: pattern.answer,
     hints: [
-      "Look at the pattern carefully. Do some items repeat?",
-      `The pattern follows a rule: ${pattern.rule}.`,
-      `The answer is ${pattern.answer}.`,
+      t.questions.hintPattern,
+      interpolate(t.questions.hintPatternRule, { rule: pattern.rule }),
+      interpolate(t.questions.hintPatternAnswer, { answer: pattern.answer }),
     ],
-    explanation: `The pattern is ${pattern.rule}, so the next item is ${pattern.answer}!`,
+    explanation: interpolate(t.questions.explanationPattern, { rule: pattern.rule, answer: pattern.answer }),
     xp: 8 + difficulty * 2,
   };
 }
 
 // ── Sequencing (Coding/Logic) ──────────────────────────────
 
-function generateSequencingQuestion(difficulty: number): {
+function generateSequencingQuestion(difficulty: number, t: Translations): {
   data: QuestionData;
   answer: number[];
   hints: string[];
@@ -217,11 +220,11 @@ function generateSequencingQuestion(difficulty: number): {
   xp: number;
 } {
   const sequences = [
-    { items: ["Wake up", "Brush teeth", "Eat breakfast", "Go to school"], name: "morning routine" },
-    { items: ["Get ingredients", "Mix batter", "Pour in pan", "Bake in oven"], name: "making a cake" },
-    { items: ["Plant seed", "Water it", "Seedling grows", "Flower blooms"], name: "growing a flower" },
-    { items: ["Open book", "Read pages", "Close book", "Think about story"], name: "reading a book" },
-    { items: ["Put on socks", "Put on shoes", "Tie laces", "Walk outside"], name: "getting ready to go out" },
+    { items: [t.questions.wakeUp, t.questions.brushTeeth, t.questions.eatBreakfast, t.questions.goToSchool], name: t.questions.morningRoutine },
+    { items: [t.questions.getIngredients, t.questions.mixBatter, t.questions.pourInPan, t.questions.bakeInOven], name: t.questions.makingCake },
+    { items: [t.questions.plantSeed, t.questions.waterIt, t.questions.seedlingGrows, t.questions.flowerBlooms], name: t.questions.growingFlower },
+    { items: [t.questions.openBook, t.questions.readPages, t.questions.closeBook, t.questions.thinkAboutStory], name: t.questions.readingBook },
+    { items: [t.questions.putOnSocks, t.questions.putOnShoes, t.questions.tieLaces, t.questions.walkOutside], name: t.questions.gettingReady },
   ];
 
   const maxIndex = Math.min(difficulty + 1, sequences.length);
@@ -231,24 +234,24 @@ function generateSequencingQuestion(difficulty: number): {
   return {
     data: {
       type: "sequencing",
-      prompt: `Put these steps in the right order for ${seq.name}:`,
+      prompt: interpolate(t.questions.putInOrder, { activity: seq.name }),
       items: shuffle(seq.items),
       correctOrder,
     },
     answer: correctOrder,
     hints: [
-      "Think about what needs to happen first.",
-      `What's the very first step in ${seq.name}?`,
-      `The first step is: "${seq.items[0]}"`,
+      t.questions.hintSequence1,
+      interpolate(t.questions.hintSequence2, { activity: seq.name }),
+      interpolate(t.questions.hintSequence3, { step: seq.items[0] }),
     ],
-    explanation: `The correct order for ${seq.name} is: ${seq.items.join(" → ")}`,
+    explanation: interpolate(t.questions.explanationSequence, { activity: seq.name, steps: seq.items.join(" → ") }),
     xp: 10 + difficulty * 2,
   };
 }
 
 // ── Block Programming (Coding/Logic) ──────────────────────
 
-function generateBlockProgrammingQuestion(difficulty: number): {
+function generateBlockProgrammingQuestion(difficulty: number, t: Translations): {
   data: QuestionData;
   answer: string[];
   hints: string[];
@@ -285,7 +288,7 @@ function generateBlockProgrammingQuestion(difficulty: number): {
   return {
     data: {
       type: "block_programming",
-      prompt: `Guide the robot 🤖 to reach the star ⭐! Use the blocks to create a path.`,
+      prompt: t.questions.robotPrompt,
       availableBlocks: [
         { id: "mf", type: "move_forward", label: "Move Forward", color: "#4CAF50" },
         { id: "tl", type: "turn_left", label: "Turn Left", color: "#2196F3" },
@@ -298,18 +301,18 @@ function generateBlockProgrammingQuestion(difficulty: number): {
     },
     answer: solution,
     hints: [
-      "First, think about which direction the robot needs to go.",
-      `The robot needs to move ${stepsRight} step(s) right and ${stepsDown} step(s) down.`,
-      `Try: ${solution.map((s) => s.replace("_", " ")).join(", ")}`,
+      t.questions.hintRobot1,
+      interpolate(t.questions.hintRobot2, { right: stepsRight, down: stepsDown }),
+      interpolate(t.questions.hintRobot3, { solution: solution.map((s) => s.replace("_", " ")).join(", ") }),
     ],
-    explanation: `The robot goes right ${stepsRight} step(s) then down ${stepsDown} step(s) to reach the star!`,
+    explanation: interpolate(t.questions.explanationRobot, { right: stepsRight, down: stepsDown }),
     xp: 15 + difficulty * 3,
   };
 }
 
 // ── Number Shapes (Preschool) ──────────────────────────────
 
-function generateShapeQuestion(difficulty: number): {
+function generateShapeQuestion(difficulty: number, t: Translations): {
   data: QuestionData;
   answer: string;
   hints: string[];
@@ -317,20 +320,20 @@ function generateShapeQuestion(difficulty: number): {
   xp: number;
 } {
   const shapes = [
-    { name: "Circle", sides: 0, emoji: "⭕" },
-    { name: "Triangle", sides: 3, emoji: "🔺" },
-    { name: "Square", sides: 4, emoji: "🟥" },
-    { name: "Rectangle", sides: 4, emoji: "📐" },
-    { name: "Pentagon", sides: 5, emoji: "⬠" },
-    { name: "Hexagon", sides: 6, emoji: "⬡" },
+    { name: t.questions.circle, sides: 0, emoji: "⭕" },
+    { name: t.questions.triangle, sides: 3, emoji: "🔺" },
+    { name: t.questions.square, sides: 4, emoji: "🟥" },
+    { name: t.questions.rectangle, sides: 4, emoji: "📐" },
+    { name: t.questions.pentagon, sides: 5, emoji: "⬠" },
+    { name: t.questions.hexagon, sides: 6, emoji: "⬡" },
   ];
 
   const maxIndex = Math.min(2 + difficulty, shapes.length);
   const shape = shapes[randomInt(0, maxIndex - 1)];
   const prompt =
     difficulty < 3
-      ? `What shape is this? ${shape.emoji}`
-      : `Which shape has ${shape.sides} sides?`;
+      ? interpolate(t.questions.whatShape, { emoji: shape.emoji })
+      : interpolate(t.questions.whichShapeHasSides, { sides: shape.sides });
 
   const options = shuffle(shapes.slice(0, maxIndex).map((s) => s.name));
   if (!options.includes(shape.name)) {
@@ -345,11 +348,17 @@ function generateShapeQuestion(difficulty: number): {
     },
     answer: shape.name,
     hints: [
-      `Look at the shape carefully. Count its sides!`,
-      `This shape has ${shape.sides === 0 ? "no corners" : `${shape.sides} sides`}.`,
-      `It's a ${shape.name}!`,
+      t.questions.hintShape1,
+      interpolate(t.questions.hintShape2, {
+        detail: shape.sides === 0
+          ? t.questions.hintShape2NoCornersText
+          : interpolate(t.questions.hintShape2SidesText, { sides: shape.sides }),
+      }),
+      interpolate(t.questions.hintShape3, { name: shape.name }),
     ],
-    explanation: `A ${shape.name} ${shape.sides === 0 ? "has no sides — it's round!" : `has ${shape.sides} sides.`}`,
+    explanation: shape.sides === 0
+      ? interpolate(t.questions.explanationShapeRound, { name: shape.name })
+      : interpolate(t.questions.explanationShapeSides, { name: shape.name, sides: shape.sides }),
     xp: 5 + difficulty,
   };
 }
@@ -374,7 +383,8 @@ function generateNumberOptions(correct: number, count: number, min: number, max:
 
 export function generateQuestion(
   gameType: GameType,
-  difficulty: number
+  difficulty: number,
+  t: Translations
 ): {
   data: QuestionData;
   answer: unknown;
@@ -384,41 +394,42 @@ export function generateQuestion(
 } {
   switch (gameType) {
     case "counting":
-      return generateCountingQuestion(difficulty);
+      return generateCountingQuestion(difficulty, t);
     case "number_recognition":
     case "shapes":
-      return generateShapeQuestion(difficulty);
+      return generateShapeQuestion(difficulty, t);
     case "addition_subtraction":
-      return generateAddSubQuestion(difficulty);
+      return generateAddSubQuestion(difficulty, t);
     case "multiplication":
     case "word_problems":
-      return generateMultiplicationQuestion(difficulty);
+      return generateMultiplicationQuestion(difficulty, t);
     case "fractions":
     case "algebra":
-      return generateFractionQuestion(difficulty);
+      return generateFractionQuestion(difficulty, t);
     case "pattern_recognition":
     case "sorting":
-      return generatePatternQuestion(difficulty);
+      return generatePatternQuestion(difficulty, t);
     case "sequencing":
-      return generateSequencingQuestion(difficulty);
+      return generateSequencingQuestion(difficulty, t);
     case "block_sequencing":
     case "conditionals":
     case "block_programming":
     case "algorithm_challenge":
     case "debugging":
-      return generateBlockProgrammingQuestion(difficulty);
+      return generateBlockProgrammingQuestion(difficulty, t);
     default:
-      return generateAddSubQuestion(difficulty);
+      return generateAddSubQuestion(difficulty, t);
   }
 }
 
 export function generateQuestionSet(
   gameType: GameType,
   difficulty: number,
-  count: number = 10
+  count: number = 10,
+  t: Translations
 ): Omit<Question, "id" | "game_id">[] {
   return Array.from({ length: count }, (_, i) => {
-    const q = generateQuestion(gameType, difficulty);
+    const q = generateQuestion(gameType, difficulty, t);
     return {
       difficulty_level: difficulty,
       question_data: q.data,

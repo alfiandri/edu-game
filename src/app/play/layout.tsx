@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { useChildStore } from "@/stores/child-store";
 import type { Child } from "@/lib/types";
 import Link from "next/link";
@@ -10,11 +9,14 @@ import XPBar from "@/components/gamification/XPBar";
 import StreakDisplay from "@/components/gamification/StreakDisplay";
 import { getLevelFromXP } from "@/components/gamification/XPBar";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/lib/i18n";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
 export default function PlayLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { selectedChild, setSelectedChild } = useChildStore();
   const [loading, setLoading] = useState(!selectedChild);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (selectedChild) return;
@@ -30,16 +32,20 @@ export default function PlayLayout({ children }: { children: React.ReactNode }) 
         return;
       }
 
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("children")
-        .select("*")
-        .eq("id", childId)
-        .single();
-
-      if (data) {
-        setSelectedChild(data as Child);
-      } else {
+      try {
+        const res = await fetch(`/api/children/${childId}`);
+        if (!res.ok) {
+          router.push("/play/select-child");
+          setLoading(false);
+          return;
+        }
+        const data = await res.json();
+        if (data.child) {
+          setSelectedChild(data.child as Child);
+        } else {
+          router.push("/play/select-child");
+        }
+      } catch {
         router.push("/play/select-child");
       }
       setLoading(false);
@@ -68,7 +74,7 @@ export default function PlayLayout({ children }: { children: React.ReactNode }) 
             <Link href="/play" className="flex items-center gap-2">
               <span className="text-2xl">🎓</span>
               <span className="text-lg font-bold text-purple-700 hidden sm:inline">
-                EduGame
+                {t.common.eduGame}
               </span>
             </Link>
             <div className="hidden md:flex items-center gap-2">
@@ -76,30 +82,31 @@ export default function PlayLayout({ children }: { children: React.ReactNode }) 
                 href="/play"
                 className="px-3 py-1.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-purple-100 transition-colors"
               >
-                🗺️ Map
+                🗺️ {t.common.map}
               </Link>
               <Link
                 href="/play/shop"
                 className="px-3 py-1.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-purple-100 transition-colors"
               >
-                🛍️ Shop
+                🛍️ {t.common.shop}
               </Link>
               <Link
                 href="/play/profile"
                 className="px-3 py-1.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-purple-100 transition-colors"
               >
-                👤 Avatar
+                👤 {t.common.avatar}
               </Link>
               <Link
                 href="/play/leaderboard"
                 className="px-3 py-1.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-purple-100 transition-colors"
               >
-                🏆 Rankings
+                🏆 {t.common.rankings}
               </Link>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             {/* Coins */}
             <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-yellow-100 border border-yellow-300">
               <span>🪙</span>
@@ -144,19 +151,19 @@ export default function PlayLayout({ children }: { children: React.ReactNode }) 
         <div className="flex justify-around py-2">
           <Link href="/play" className="flex flex-col items-center gap-0.5 p-1">
             <span className="text-xl">🗺️</span>
-            <span className="text-[10px] font-bold text-gray-600">Map</span>
+            <span className="text-[10px] font-bold text-gray-600">{t.common.map}</span>
           </Link>
           <Link href="/play/shop" className="flex flex-col items-center gap-0.5 p-1">
             <span className="text-xl">🛍️</span>
-            <span className="text-[10px] font-bold text-gray-600">Shop</span>
+            <span className="text-[10px] font-bold text-gray-600">{t.common.shop}</span>
           </Link>
           <Link href="/play/profile" className="flex flex-col items-center gap-0.5 p-1">
             <span className="text-xl">👤</span>
-            <span className="text-[10px] font-bold text-gray-600">Avatar</span>
+            <span className="text-[10px] font-bold text-gray-600">{t.common.avatar}</span>
           </Link>
           <Link href="/play/leaderboard" className="flex flex-col items-center gap-0.5 p-1">
             <span className="text-xl">🏆</span>
-            <span className="text-[10px] font-bold text-gray-600">Rank</span>
+            <span className="text-[10px] font-bold text-gray-600">{t.common.rank}</span>
           </Link>
         </div>
       </div>
