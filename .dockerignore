@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.env*
+*.md
+.dockerignore
+docker-compose.yml
+nginx.conf
+supabase
